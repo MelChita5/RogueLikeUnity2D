@@ -11,8 +11,8 @@ public class RoomManager : MonoBehaviour
     int roomWidth = 20;
     int roomHeight = 12;
 
-    int gridSizeX = 10;
-    int gridSizeY = 10;
+    [SerializeField] int gridSizeX = 10;
+    [SerializeField] int gridSizeY = 10;
 
     private List<GameObject> roomObjects = new List<GameObject>();
 
@@ -47,6 +47,11 @@ public class RoomManager : MonoBehaviour
             TryGenerateRoom(new Vector2Int(gridX + 1, gridY));
             TryGenerateRoom(new Vector2Int(gridX, gridY + 1));
             TryGenerateRoom(new Vector2Int(gridX, gridY - 1));
+        }
+        else if (roomCount < minRooms)
+        {
+            Debug.Log("RoomCount was less than the minimum amount of rooms. Trying again");
+            RegenerateRooms();
         }
         else if (!generationComplete)
         {
@@ -103,6 +108,15 @@ public class RoomManager : MonoBehaviour
 
     private void RegenerateRooms()
     {
+        roomObjects.ForEach(Destroy);
+        roomObjects.Clear();
+        roomGrid = new int[gridSizeX, gridSizeY];
+        roomQueue.Clear();
+        roomCount = 0;
+        generationComplete = false;
+
+        Vector2Int initialRoomIndex = new Vector2Int(gridSizeX / 2, gridSizeY / 2);
+        StartRoomGenerationFromRoom(initialRoomIndex);
 
     }
 
