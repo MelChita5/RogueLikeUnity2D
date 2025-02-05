@@ -262,6 +262,8 @@ MonoBehaviour:
   roomPrefab: {fileID: 239200500177972848, guid: 03cf8b2106d697147a6f8671e89691c1, type: 3}
   maxRooms: 15
   minRooms: 10
+  gridSizeX: 10
+  gridSizeY: 10
 --- !u!4 &1417011228
 Transform:
   m_ObjectHideFlags: 0
@@ -289,9 +291,8 @@ GameObject:
   - component: {fileID: 1535900153}
   - component: {fileID: 1535900157}
   - component: {fileID: 1535900156}
-  - component: {fileID: 1535900155}
-  - component: {fileID: 1535900159}
   - component: {fileID: 1535900158}
+  - component: {fileID: 1535900159}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -366,22 +367,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1535900155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1535900151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7a68234a643d654c92872c3fcefa26e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  lastHorizontalVector: 0
-  lastVerticalVector: 0
-  moveDir: {x: 0, y: 0}
 --- !u!61 &1535900156
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -484,9 +469,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1535900151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed92cde9253503e4dba08538217322d0, type: 3}
+  m_Script: {fileID: 11500000, guid: dc942bcc0e91c604db9a7a243c484ab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 5
+  lastHorizontalVector: 0
+  lastVerticalVector: 0
+  moveDir: {x: 0, y: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
