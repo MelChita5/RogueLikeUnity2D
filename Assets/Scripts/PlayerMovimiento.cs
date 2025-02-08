@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerMovimiento : MonoBehaviour
@@ -8,11 +10,15 @@ public class PlayerMovimiento : MonoBehaviour
     public Transform firePoint; // Punto de disparo
     public Vector2 moveDir;
     public float moveSpeed;
+    public int maxHealt = 100;
+    public int currentHealt;
+    bool dead = false;
     Rigidbody2D rb;
     [HideInInspector]
     public float lastHorizontalVector;
     [HideInInspector]
     public float lastVerticalVector;
+    [SerializeField] TextMeshProUGUI healthText;
 
 
 
@@ -22,11 +28,23 @@ public class PlayerMovimiento : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();  // Inicialización del Rigidbody2D
         _animator = GetComponent<Animator>();
+
+        healthText.text = maxHealt.ToString();
+        currentHealt = maxHealt;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (dead)
+        {
+            moveDir = Vector2.zero;
+            _animator.SetFloat("Velocity", 0);
+            return;
+        }
+        {
+            
+        }
         InputManagement(); // Maneja las entradas para el movimiento y disparo
 
         if (Input.GetKeyDown(KeyCode.Space)) // Presionar Espacio para disparar
@@ -120,5 +138,54 @@ public class PlayerMovimiento : MonoBehaviour
     {
         // Aplica la velocidad al Rigidbody2D para mover al jugador
         rb.velocity = new Vector2(moveDir.x * moveSpeed, moveDir.y * moveSpeed);
+
+        if (moveDir.x != 0 || moveDir.y != 0)
+        {
+            SetAnimatorMovement(moveDir);
+        }
+        else
+        {
+            _animator.SetLayerWeight(1, 0);
+        }
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+
+        if (enemy != null)
+            Hit(20);
+    }
+
+    void Hit(int damage)
+    {
+        _animator.SetTrigger("hit");
+        currentHealt -= damage;
+        healthText.text = Mathf.Clamp(currentHealt, 0 , maxHealt).ToString();
+
+        if (currentHealt <= 0)
+            Die();
+    }
+
+    void Die()
+    {
+        dead = true;
+    }
+
+    void SetAnimatorMovement(Vector2 moveDir)
+    {
+        // Si el personaje se está moviendo, activamos 'isMoving'
+        bool isMoving = moveDir.magnitude > 0;
+        _animator.SetBool("isMoving", isMoving);
+
+        if (isMoving)
+        {
+            // Determinar la dirección y activar solo el parámetro correspondiente
+            _animator.SetBool("lookingRight", moveDir.x > 0);
+            _animator.SetBool("lookingLeft", moveDir.x < 0);
+            _animator.SetBool("lookingUp", moveDir.y > 0);
+            _animator.SetBool("lookingDown", moveDir.y < 0);
+        }
+    }
+
 }
