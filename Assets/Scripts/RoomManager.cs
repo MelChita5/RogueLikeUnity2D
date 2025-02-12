@@ -8,8 +8,8 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private int maxRooms = 15;
     [SerializeField] private int minRooms = 10;
 
-    int roomWidth = 20;
-    int roomHeight = 12;
+    int roomWidth = 15;  // Ajusta el tamaño de las habitaciones aquí
+    int roomHeight = 10;
 
     [SerializeField] int gridSizeX = 10;
     [SerializeField] int gridSizeY = 10;
@@ -192,9 +192,14 @@ public class RoomManager : MonoBehaviour
     {
         int gridX = gridIndex.x;
         int gridY = gridIndex.y;
-        return new Vector3(roomWidth * (gridX - gridSizeX / 2),
-               roomHeight * (gridY - gridSizeY / 2));
+        // Reducir la distancia entre las habitaciones
+        float newRoomWidth = 18f;  // Ajusta este valor
+        float newRoomHeight = 10f; // Ajusta este valor
+
+        return new Vector3(newRoomWidth * (gridX - gridSizeX / 2),
+                           newRoomHeight * (gridY - gridSizeY / 2));
     }
+
     private void OnDrawGizmos()
     {
         Color gizmoColor = new Color(0, 1, 1, 0.05f);

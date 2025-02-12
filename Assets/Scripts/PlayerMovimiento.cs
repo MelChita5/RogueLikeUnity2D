@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerMovimiento : MonoBehaviour
 {
@@ -14,14 +15,16 @@ public class PlayerMovimiento : MonoBehaviour
     public Transform firePoint;
 
     [Header("Vida")]
-    public int maxHealth = 5;
+    public int maxHealth = 100;
     private int currentHealth;
     private bool isDead = false;
 
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI healthText;
+
     private Animator _animator;
     private SpriteRenderer spriteRenderer;
-
-    private int deathKeyPressCount = 0; // Contador de veces que se presiona la tecla
+    private int deathKeyPressCount = 0;
 
     void Start()
     {
@@ -31,8 +34,8 @@ public class PlayerMovimiento : MonoBehaviour
         currentHealth = maxHealth;
         moveDir = Vector2.zero;
         rb.velocity = Vector2.zero;
-
         _animator.SetBool("isMoving", false);
+        healthText.text = currentHealth.ToString();
     }
 
     void Update()
@@ -40,27 +43,18 @@ public class PlayerMovimiento : MonoBehaviour
         if (isDead) return;
 
         HandleInput();
+        Move();  // Movemos en Update() para una mejor respuesta
 
         if (Input.GetKeyDown(KeyCode.Space))
             Shoot();
 
-        // Contador de tecla presionada (M)
         if (Input.GetKeyDown(KeyCode.M))
         {
             deathKeyPressCount++;
             Debug.Log("Tecla M presionada: " + deathKeyPressCount + " veces.");
-
             if (deathKeyPressCount >= 5)
-            {
-                Debug.Log("Muerte activada por la tecla.");
                 Die();
-            }
         }
-    }
-
-    void FixedUpdate()
-    {
-        Move();
     }
 
     void HandleInput()
@@ -70,13 +64,37 @@ public class PlayerMovimiento : MonoBehaviour
 
         moveDir = new Vector2(moveX, moveY).normalized;
 
-        bool isMoving = moveDir.sqrMagnitude > 0;
-        _animator.SetBool("isMoving", isMoving);
+        // Aplicamos las animaciones inmediatamente para reflejar el input sin retrasos
+        _animator.SetBool("isMoving", moveDir.sqrMagnitude > 0);
 
-        _animator.SetBool("lookingRight", moveX > 0);
-        _animator.SetBool("lookingLeft", moveX < 0);
-        _animator.SetBool("lookingUp", moveY > 0);
-        _animator.SetBool("lookingDown", moveY < 0);
+        if (moveX > 0)  // Mirando a la derecha
+        {
+            _animator.SetBool("lookingRight", true);
+            _animator.SetBool("lookingLeft", false);
+            _animator.SetBool("lookingUp", false);
+            _animator.SetBool("lookingDown", false);
+        }
+        else if (moveX < 0)  // Mirando a la izquierda
+        {
+            _animator.SetBool("lookingRight", false);
+            _animator.SetBool("lookingLeft", true);
+            _animator.SetBool("lookingUp", false);
+            _animator.SetBool("lookingDown", false);
+        }
+        else if (moveY > 0)  // Mirando arriba
+        {
+            _animator.SetBool("lookingRight", false);
+            _animator.SetBool("lookingLeft", false);
+            _animator.SetBool("lookingUp", true);
+            _animator.SetBool("lookingDown", false);
+        }
+        else if (moveY < 0)  // Mirando abajo
+        {
+            _animator.SetBool("lookingRight", false);
+            _animator.SetBool("lookingLeft", false);
+            _animator.SetBool("lookingUp", false);
+            _animator.SetBool("lookingDown", true);
+        }
     }
 
     void Move()
@@ -88,7 +106,6 @@ public class PlayerMovimiento : MonoBehaviour
     void Shoot()
     {
         if (isDead) return;
-
         if (bulletPrefab == null || firePoint == null)
         {
             Debug.LogError("BulletPrefab o FirePoint no están asignados.");
@@ -110,22 +127,26 @@ public class PlayerMovimiento : MonoBehaviour
         else if (_animator.GetBool("lookingDown")) bulletScript.direction = Vector2.down;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+        if (enemy != null)
+            TakeDamage(20);
+    }
+
     public void TakeDamage(int damage)
     {
         if (isDead) return;
 
         currentHealth -= damage;
+        healthText.text = Mathf.Clamp(currentHealth, 0, maxHealth).ToString();
         Debug.Log("Recibiendo daño... Salud actual: " + currentHealth);
 
         _animator.SetTrigger("Hurt");
-
         StartCoroutine(BlinkEffect());
 
         if (currentHealth <= 0)
-        {
-            Debug.Log("Jugador ha muerto.");
             Die();
-        }
     }
 
     void Die()
@@ -138,8 +159,13 @@ public class PlayerMovimiento : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
         rb.simulated = false;
 
-        float delay = 2.5f;
-        Invoke("RestartLevel", delay);
+        StartCoroutine(DeathAnimation());
+    }
+
+    IEnumerator DeathAnimation()
+    {
+        yield return new WaitForSeconds(2.5f);
+        RestartLevel();
     }
 
     public void RestartLevel()

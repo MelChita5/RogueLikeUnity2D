@@ -22,8 +22,6 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: 31906365, guid: 96369ba1270c6e24fb3e8096e7f0d282, type: 3}
-    - time: 0.016666668
-      value: {fileID: 31906365, guid: 96369ba1270c6e24fb3e8096e7f0d282, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -47,13 +45,12 @@ AnimationClip:
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
     - {fileID: 31906365, guid: 96369ba1270c6e24fb3e8096e7f0d282, type: 3}
-    - {fileID: 31906365, guid: 96369ba1270c6e24fb3e8096e7f0d282, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.033333335
+    m_StopTime: 0.016666668
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -76,14 +73,7 @@ AnimationClip:
   - time: 0
     functionName: Die
     data: 
-    objectReferenceParameter: {fileID: 31906365, guid: 96369ba1270c6e24fb3e8096e7f0d282, type: 3}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.016666668
-    functionName: Die
-    data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 75aefc1758f9fbc41af3579fdd45aa62, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

@@ -15,28 +15,27 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
-
-        // Intentamos encontrar al jugador
-        GameObject player = GameObject.Find("Player");
-        if (player != null)
-        {
-            target = player.transform;
-        }
-        else
-        {
-            Debug.LogError("No se encontró el objeto 'Player' en la escena.");
-        }
-
+        target = GameObject.Find("Player").transform;
         _anim = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        if (target == null) return; // Si el jugador no existe, no hacemos nada
+        if (target != null)
+        {
+            Vector3 direction = target.position - transform.position;
+            direction.Normalize();
 
-        Vector3 direction = target.position - transform.position;
-        direction.Normalize();
+            transform.position += direction * speed * Time.deltaTime;
+        }
+    }
 
-        transform.position += direction * speed * Time.deltaTime;
+    public void Hit(int damage)
+    {
+        currentHealth -= damage;
+        _anim.SetTrigger("hit");
+
+        if (currentHealth <= 0)
+            Destroy(gameObject);
     }
 }
