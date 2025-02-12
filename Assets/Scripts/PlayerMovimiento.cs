@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement; // Importar SceneManager
+using UnityEngine.SceneManagement;
 
 public class PlayerMovimiento : MonoBehaviour
 {
@@ -15,16 +14,20 @@ public class PlayerMovimiento : MonoBehaviour
     public Transform firePoint;
 
     [Header("Vida")]
-    public int maxHealth = 3;
+    public int maxHealth = 5;
     private int currentHealth;
     private bool isDead = false;
 
     private Animator _animator;
+    private SpriteRenderer spriteRenderer;
+
+    private int deathKeyPressCount = 0; // Contador de veces que se presiona la tecla
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         currentHealth = maxHealth;
         moveDir = Vector2.zero;
         rb.velocity = Vector2.zero;
@@ -41,8 +44,18 @@ public class PlayerMovimiento : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
             Shoot();
 
-        if (Input.GetKeyDown(KeyCode.K))
-            TakeDamage(1);
+        // Contador de tecla presionada (M)
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            deathKeyPressCount++;
+            Debug.Log("Tecla M presionada: " + deathKeyPressCount + " veces.");
+
+            if (deathKeyPressCount >= 5)
+            {
+                Debug.Log("Muerte activada por la tecla.");
+                Die();
+            }
+        }
     }
 
     void FixedUpdate()
@@ -101,38 +114,48 @@ public class PlayerMovimiento : MonoBehaviour
     {
         if (isDead) return;
 
+        currentHealth -= damage;
         Debug.Log("Recibiendo daño... Salud actual: " + currentHealth);
 
-        currentHealth -= damage;
         _animator.SetTrigger("Hurt");
+
+        StartCoroutine(BlinkEffect());
 
         if (currentHealth <= 0)
         {
-            Debug.Log("Jugador ha llegado a 0 de salud, muriendo...");
+            Debug.Log("Jugador ha muerto.");
             Die();
         }
     }
 
     void Die()
     {
-        if (isDead) return;  // Asegurarnos de que la función se ejecute solo una vez
+        if (isDead) return;
 
-        isDead = true;  // Marcar como muerto
-        _animator.SetTrigger("Die");  // Activar la animación de muerte
-        rb.velocity = Vector2.zero;  // Detener el movimiento
-        GetComponent<Collider2D>().enabled = false;  // Desactivar el collider para evitar colisiones
-        rb.simulated = false;  // Desactivar la física del Rigidbody2D
+        isDead = true;
+        _animator.SetTrigger("Die");
+        rb.velocity = Vector2.zero;
+        GetComponent<Collider2D>().enabled = false;
+        rb.simulated = false;
 
-        // Usar Invoke para llamar a RestartLevel después de un retraso, para dar tiempo a la animación de muerte
-        float delay = 2.5f; // Ajusta este valor según la duración de tu animación de muerte
+        float delay = 2.5f;
         Invoke("RestartLevel", delay);
     }
 
     public void RestartLevel()
     {
-        // Aquí ya puedes reiniciar la escena una vez que la animación haya terminado
         Debug.Log("Reiniciando el nivel...");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);  // Reiniciar el nivel actual
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    IEnumerator BlinkEffect()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            spriteRenderer.enabled = false;
+            yield return new WaitForSeconds(0.1f);
+            spriteRenderer.enabled = true;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
 }
