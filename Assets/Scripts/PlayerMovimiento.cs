@@ -166,6 +166,13 @@ public class PlayerMovimiento : MonoBehaviour
     {
         yield return new WaitForSeconds(2.5f);
         RestartLevel();
+        GoToMenuInicial();
+    }
+
+    public void GoToMenuInicial()
+    {
+        Debug.Log("Regresando al menú inicial...");
+        SceneManager.LoadScene("MenuInicial");
     }
 
     public void RestartLevel()

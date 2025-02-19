@@ -3,7 +3,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float speed = 10f;
-    public Vector2 direction; // La dirección en la que viajará la bala
+    public Vector2 direction;
 
     private void FixedUpdate()
     {
@@ -13,10 +13,17 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collider)
     {
         var enemy = collider.gameObject.GetComponent<Enemy>();
-        if (enemy != null) 
+        if (enemy != null)
         {
             enemy.Hit(200);
-            Destroy(gameObject); // Destruye la bala si sale de la pantalla
-        }       
+            Destroy(gameObject); // Destruye la bala si golpea un enemigo
+            return;
+        }
+
+        //  Verifica si choca con una pared o puerta
+        if (collider.CompareTag("Wall") || collider.CompareTag("Door"))
+        {
+            Destroy(gameObject); // Destruye la bala si toca una pared o puerta
+        }
     }
 }
